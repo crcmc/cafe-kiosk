@@ -1,0 +1,470 @@
+/* 어린이집 카페 키오스크 — PPT 화면 설계 기반
+   배경 #DFF7C2, 포인트 그린 #53AB58, 1920x1080 스테이지 스케일링 */
+
+:root {
+  --bg: #DFF7C2;
+  --green: #53AB58;
+  --card: #DFF7C2;
+  --white: #FFFFFF;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  font-family: "210 키위바나나", "Lazydog", "BM JUA", "Jua",
+    "Tmoney RoundWind", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+/* ── 1920x1080 고정 스테이지 (JS가 화면 크기에 맞춰 scale) ── */
+#stage {
+  position: absolute;
+  width: 1920px;
+  height: 1080px;
+  transform-origin: top left;
+}
+
+.screen {
+  position: absolute;
+  inset: 0;
+  background: var(--bg);
+  overflow: hidden;
+  display: none;
+}
+.screen.active { display: block; }
+
+.deco {
+  position: absolute;
+  pointer-events: none;
+}
+
+/* ── 시작 화면 ── */
+#screen-start { cursor: pointer; }
+
+#start-sign {
+  /* 아이들이 쓴 "오로라 주스 가게" 글씨 (투명 배경 컷아웃) */
+  position: absolute;
+  left: calc(50% - 790px); /* 애니메이션이 transform을 쓰므로 left로 중앙 정렬 */
+  top: 360px;
+  width: 1580px;
+  padding: 44px 64px;
+  background: rgba(255, 255, 255, .78); /* 종이 느낌의 흰 받침 */
+  border-radius: 48px;
+  box-shadow: 0 14px 36px rgba(60, 110, 60, .28);
+  z-index: 2;
+  animation: signFloat 3s ease-in-out infinite;
+}
+#start-sign img {
+  display: block;
+  width: 100%;
+}
+@keyframes signFloat {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50%      { transform: translateY(-16px) rotate(1deg); }
+}
+
+#start-hint {
+  position: absolute;
+  left: 0; right: 0;
+  bottom: 90px;
+  text-align: center;
+  font-size: 52px;
+  font-weight: bold;
+  color: var(--green);
+  text-shadow: 0 3px 0 #fff;
+  z-index: 2;
+  animation: hintPulse 1.6s ease-in-out infinite;
+}
+@keyframes hintPulse {
+  0%, 100% { opacity: .55; transform: scale(1); }
+  50%      { opacity: 1;   transform: scale(1.06); }
+}
+
+/* ── 공통 패널 ── */
+.panel {
+  position: absolute;
+  left: 108px;
+  top: 110px;
+  width: 1704px;
+  height: 864px;
+  background: var(--white);
+  border: 6px solid var(--green);
+  border-radius: 36px;
+  z-index: 1;
+}
+
+.panel-title {
+  margin-top: 14px;
+  text-align: center;
+  font-size: 58px;
+  color: var(--green);
+  letter-spacing: 6px;
+}
+
+/* ── 주문 화면: 제목 → 탭 → 메뉴판이 빈틈없이 이어지는 세로 배치 ── */
+#screen-order .panel {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── 카테고리 탭 (메뉴판 위에 바로 붙는 폴더 탭) ── */
+#tabs {
+  display: flex;
+  gap: 0;
+  margin-top: 8px;
+}
+.tab {
+  flex: 1;
+  height: 112px;
+  border: 5px solid var(--green);
+  border-bottom: none; /* 아래는 메뉴판 테두리와 맞닿음 */
+  border-radius: 28px 28px 0 0;
+  background: var(--card);
+  color: var(--green);
+  font-family: inherit;
+  font-size: 52px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform .12s;
+}
+.tab:active { transform: scale(.96); }
+.tab.active {
+  background: var(--green);
+  color: var(--white);
+}
+
+/* ── 메뉴판 ── */
+#menu-board {
+  flex: 1;
+  min-height: 0;
+  border-top: 5px solid var(--green);
+  border-radius: 0 0 30px 30px;
+  overflow: hidden;
+}
+
+#menu-grid {
+  height: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  justify-content: center;
+  gap: 24px 40px;
+  padding: 20px 30px;
+}
+
+/* 메뉴가 6개 이상(2줄)인 카테고리는 5열 균등 격자로, 카드와 글씨를 축소
+   (칸 너비를 똑같이 맞춰 가격 표시 길이가 달라도 카드가 반듯하게 정렬됨) */
+#menu-grid.compact {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  justify-items: stretch;
+  align-content: center;
+  gap: 20px 0;
+  padding: 20px 24px;
+}
+#menu-grid.compact .menu-item { width: 100%; }
+#menu-grid.compact .menu-name { font-size: 34px; margin-top: 6px; }
+#menu-grid.compact .menu-price { margin-top: 4px; min-height: 26px; }
+#menu-grid.compact .menu-price img { width: 44px; }
+#menu-grid.compact .menu-price img.coin { width: 22px; }
+#menu-grid.compact .menu-price .won { font-size: 24px; }
+
+.menu-item {
+  border: none;
+  background: none;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: center;
+  transition: transform .12s;
+}
+.menu-item:active { transform: scale(.92); }
+.menu-item.added { animation: itemPop .35s; }
+@keyframes itemPop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.12) rotate(-3deg); }
+  100% { transform: scale(1); }
+}
+
+.menu-card {
+  position: relative;
+  width: var(--card-size, 281px);
+  height: var(--card-size, 281px);
+  margin: 0 auto; /* 고정 폭 카드를 항상 가운데 정렬 (메뉴명·가격과 축 일치) */
+  background: var(--card);
+  border-radius: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.menu-card img.drink {
+  max-width: 62%;
+  max-height: 74%;
+}
+.menu-card img.garnish {
+  position: absolute;
+  width: 26%;
+  right: 12%;
+  bottom: 12%;
+}
+
+.menu-name {
+  display: block;
+  margin-top: 12px;
+  font-size: 44px;
+  font-weight: bold;
+  color: #333;
+}
+
+.menu-price {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 8px;
+  min-height: 34px;
+}
+.menu-price img { width: 52px; }
+.menu-price img.coin { width: 26px; }
+.menu-price .won {
+  font-size: 30px;
+  color: var(--green);
+  font-weight: bold;
+  margin-left: 6px;
+}
+
+/* ── 장바구니 버튼 ── */
+#cart-btn {
+  position: absolute;
+  right: 42px;
+  bottom: 25px;
+  width: 133px;
+  height: 133px;
+  border: 5px solid var(--green);
+  border-radius: 50%;
+  background: var(--white);
+  cursor: pointer;
+  z-index: 5;
+  transition: transform .15s;
+}
+#cart-btn:active { transform: scale(.9); }
+#cart-btn img { width: 70%; }
+#cart-badge {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  min-width: 54px;
+  height: 54px;
+  padding: 0 10px;
+  border-radius: 27px;
+  background: #E85D4A;
+  color: #fff;
+  font-size: 34px;
+  font-weight: bold;
+  line-height: 54px;
+}
+#cart-badge.bounce { animation: badgeBounce .4s; }
+@keyframes badgeBounce {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.5); }
+  100% { transform: scale(1); }
+}
+
+/* ── 주문 목록 화면 ── */
+#cart-table {
+  position: absolute;
+  left: 70px;
+  right: 490px; /* 결제하기 버튼과 겹치지 않도록 */
+  top: 150px;
+  bottom: 60px;
+  display: flex;
+  flex-direction: column;
+}
+
+#cart-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 18px 60px;
+  background: var(--green);
+  color: #fff;
+  font-size: 48px;
+  font-weight: bold;
+  border-radius: 24px 24px 0 0;
+}
+
+#cart-rows {
+  flex: 1;
+  overflow-y: auto;
+  border: 5px solid var(--green);
+  border-top: none;
+  background: #fff;
+}
+
+.cart-row {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 14px 40px;
+  border-bottom: 3px dashed #b9dfa0;
+  font-size: 44px;
+}
+.cart-row img.thumb { height: 90px; }
+.cart-row .name { flex: 1; text-align: left; }
+.cart-row .amount { width: 260px; text-align: right; color: var(--green); font-weight: bold; }
+
+.qty-btn {
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  border: 4px solid var(--green);
+  background: var(--card);
+  color: var(--green);
+  font-size: 44px;
+  font-weight: bold;
+  font-family: inherit;
+  cursor: pointer;
+  line-height: 1;
+}
+.qty-btn:active { background: var(--green); color: #fff; }
+.qty { width: 70px; text-align: center; font-weight: bold; }
+
+#cart-empty {
+  padding: 80px 0;
+  text-align: center;
+  font-size: 50px;
+  color: #9bbf85;
+}
+
+#cart-total {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px 60px;
+  border: 5px solid var(--green);
+  border-top: none;
+  border-radius: 0 0 24px 24px;
+  background: var(--card);
+  font-size: 54px;
+  font-weight: bold;
+  color: var(--green);
+}
+
+#back-to-menu {
+  position: absolute;
+  left: 70px;
+  top: 36px;
+  padding: 10px 30px;
+  border: 4px solid var(--green);
+  border-radius: 40px;
+  background: var(--card);
+  color: var(--green);
+  font-family: inherit;
+  font-size: 36px;
+  font-weight: bold;
+  cursor: pointer;
+}
+#back-to-menu:active { background: var(--green); color: #fff; }
+
+#checkout-btn {
+  position: absolute;
+  left: 1447px;
+  top: 605px;
+  width: 348px;
+  height: 302px;
+  border: none;
+  border-radius: 40px;
+  background: var(--green);
+  color: #fff;
+  font-family: inherit;
+  font-size: 60px;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 22px;
+  gap: 8px;
+  box-shadow: 0 10px 24px rgba(60, 110, 60, .35);
+  transition: transform .15s;
+}
+#checkout-btn:active { transform: scale(.94); }
+#checkout-btn:disabled { opacity: .45; cursor: default; }
+.coin-circle {
+  width: 170px;
+  height: 170px;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.coin-circle img { width: 78%; }
+
+/* ── 결제 화면 ── */
+#pay-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 160px;
+  margin-top: 60px;
+}
+.pay-btn {
+  width: 600px;
+  height: 520px;
+  border: none;
+  border-radius: 48px;
+  background: var(--green);
+  cursor: pointer;
+  font-family: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 26px;
+  gap: 20px;
+  transition: transform .15s;
+}
+.pay-btn:active { transform: scale(.95); }
+.pay-label {
+  color: #fff;
+  font-size: 84px;
+  font-weight: bold;
+}
+.pay-circle {
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pay-circle img { width: 72%; }
+
+/* ── 안내 화면 (슬라이드 9~13) ── */
+.msg-screen .msg {
+  position: absolute;
+  left: 0; right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: center;
+  font-size: 110px;
+  font-weight: bold;
+  color: #3a3a3a;
+  line-height: 1.5;
+  z-index: 2;
+  text-shadow: 0 4px 0 rgba(255, 255, 255, .8);
+}
+
+.dots span {
+  display: inline-block;
+  animation: dotJump 1.2s infinite;
+}
+.dots span:nth-child(2) { animation-delay: .2s; }
+.dots span:nth-child(3) { animation-delay: .4s; }
+@keyframes dotJump {
+  0%, 60%, 100% { transform: translateY(0); }
+  30%           { transform: translateY(-26px); }
+}

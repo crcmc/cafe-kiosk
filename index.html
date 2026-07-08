@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오로라 주스 가게 - 카페 키오스크</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="stage">
+
+  <!-- 1. 시작 화면 (슬라이드 1) -->
+  <section class="screen active" id="screen-start">
+    <img class="deco" src="assets/images/image3.png" style="left:303px;top:-192px;width:506px" alt="">
+    <img class="deco" src="assets/images/image7.png" style="left:1033px;top:-286px;width:558px" alt="">
+    <img class="deco" src="assets/images/image5.png" style="left:1699px;top:-56px;width:657px" alt="">
+    <img class="deco" src="assets/images/image2.png" style="left:-202px;top:167px;width:618px" alt="">
+    <img class="deco" src="assets/images/image4.png" style="left:556px;top:328px;width:688px;transform:rotate(15deg)" alt="">
+    <img class="deco" src="assets/images/image1.png" style="left:1418px;top:414px;width:651px" alt="">
+    <img class="deco" src="assets/images/image8.png" style="left:152px;top:687px;width:409px;transform:rotate(12deg)" alt="">
+    <img class="deco" src="assets/images/image6.png" style="left:814px;top:841px;width:528px" alt="">
+    <div id="start-sign">
+      <img src="assets/images/sign-title.png" alt="오로라 주스 가게">
+    </div>
+    <div id="start-hint">화면을 눌러 주문을 시작하세요!</div>
+  </section>
+
+  <!-- 2. 주문 화면 (슬라이드 2~6) -->
+  <section class="screen" id="screen-order">
+    <img class="deco" src="assets/images/image3.png" style="left:108px;top:-104px;width:349px" alt="">
+    <img class="deco" src="assets/images/image7.png" style="left:612px;top:-169px;width:385px" alt="">
+    <img class="deco" src="assets/images/image5.png" style="left:1508px;top:-71px;width:454px" alt="">
+    <img class="deco" src="assets/images/image2.png" style="left:-201px;top:550px;width:427px" alt="">
+    <img class="deco" src="assets/images/image1.png" style="left:1641px;top:692px;width:450px" alt="">
+    <img class="deco" src="assets/images/image6.png" style="left:779px;top:851px;width:364px" alt="">
+    <img class="deco" src="assets/images/image8.png" style="left:43px;top:910px;width:282px" alt="">
+
+    <div class="panel">
+      <h1 class="panel-title">주문화면</h1>
+      <nav id="tabs"></nav>
+      <div id="menu-board">
+        <div id="menu-grid"></div>
+      </div>
+    </div>
+
+    <button id="cart-btn" aria-label="주문 목록 보기">
+      <img src="assets/images/image31.svg" alt="장바구니">
+      <span id="cart-badge" hidden>0</span>
+    </button>
+  </section>
+
+  <!-- 3. 주문 목록 화면 (슬라이드 7) -->
+  <section class="screen" id="screen-cart">
+    <img class="deco" src="assets/images/image3.png" style="left:108px;top:-104px;width:349px" alt="">
+    <img class="deco" src="assets/images/image7.png" style="left:612px;top:-169px;width:385px" alt="">
+    <img class="deco" src="assets/images/image5.png" style="left:1508px;top:-71px;width:454px" alt="">
+    <img class="deco" src="assets/images/image2.png" style="left:-201px;top:550px;width:427px" alt="">
+    <img class="deco" src="assets/images/image1.png" style="left:1641px;top:692px;width:450px" alt="">
+    <img class="deco" src="assets/images/image6.png" style="left:779px;top:851px;width:364px" alt="">
+    <img class="deco" src="assets/images/image8.png" style="left:43px;top:910px;width:282px" alt="">
+
+    <div class="panel">
+      <h1 class="panel-title">주문화면</h1>
+      <div id="cart-table">
+        <div id="cart-header"><span>주문 목록</span><span>금액</span></div>
+        <div id="cart-rows"></div>
+        <div id="cart-total"><span>합계</span><span id="cart-total-amount">0원</span></div>
+      </div>
+      <button id="back-to-menu">◀ 메뉴 더 고르기</button>
+    </div>
+
+    <button id="checkout-btn">
+      <span>결제하기</span>
+      <span class="coin-circle"><img src="assets/images/image70.svg" alt=""></span>
+    </button>
+  </section>
+
+  <!-- 4. 결제 화면 (슬라이드 8) -->
+  <section class="screen" id="screen-pay">
+    <img class="deco" src="assets/images/image3.png" style="left:108px;top:-104px;width:349px" alt="">
+    <img class="deco" src="assets/images/image7.png" style="left:612px;top:-169px;width:385px" alt="">
+    <img class="deco" src="assets/images/image5.png" style="left:1508px;top:-71px;width:454px" alt="">
+    <img class="deco" src="assets/images/image2.png" style="left:-201px;top:550px;width:427px" alt="">
+    <img class="deco" src="assets/images/image1.png" style="left:1641px;top:692px;width:450px" alt="">
+    <img class="deco" src="assets/images/image6.png" style="left:779px;top:851px;width:364px" alt="">
+    <img class="deco" src="assets/images/image8.png" style="left:43px;top:910px;width:282px" alt="">
+
+    <div class="panel">
+      <h1 class="panel-title">결제화면</h1>
+      <div id="pay-buttons">
+        <button class="pay-btn" data-method="card">
+          <span class="pay-label">카드결제</span>
+          <span class="pay-circle"><img src="assets/images/image72.svg" alt="카드"></span>
+        </button>
+        <button class="pay-btn" data-method="cash">
+          <span class="pay-label">현금결제</span>
+          <span class="pay-circle"><img src="assets/images/image73.png" alt="현금"></span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. 현금 안내 (슬라이드 9) -->
+  <section class="screen msg-screen" id="screen-cash">
+    <img class="deco" src="assets/images/image6.png" style="left:-138px;top:32px;width:562px" alt="">
+    <img class="deco" src="assets/images/image6.png" style="left:-76px;top:540px;width:562px" alt="">
+    <img class="deco" src="assets/images/image2.png" style="left:1294px;top:92px;width:924px" alt="">
+    <p class="msg">현금은 직원에게 주세요.</p>
+  </section>
+
+  <!-- 6. 카드 안내 (슬라이드 10) -->
+  <section class="screen msg-screen" id="screen-card">
+    <img class="deco" src="assets/images/image6.png" style="left:-138px;top:32px;width:562px" alt="">
+    <img class="deco" src="assets/images/image6.png" style="left:-76px;top:540px;width:562px" alt="">
+    <img class="deco" src="assets/images/image2.png" style="left:1294px;top:92px;width:924px" alt="">
+    <p class="msg">카드를 넣어주세요.</p>
+  </section>
+
+  <!-- 7. 결제 중 (슬라이드 11) -->
+  <section class="screen msg-screen" id="screen-processing">
+    <img class="deco" src="assets/images/image75.png" style="left:-197px;top:-281px;width:772px" alt="">
+    <img class="deco" src="assets/images/image75.png" style="left:97px;top:699px;width:486px" alt="">
+    <img class="deco" src="assets/images/image74.png" style="left:1187px;top:21px;width:1320px" alt="">
+    <p class="msg">결제 중 <span class="dots"><span>.</span> <span>.</span> <span>.</span></span></p>
+  </section>
+
+  <!-- 8. 결제 완료 (슬라이드 12) -->
+  <section class="screen msg-screen" id="screen-card-done">
+    <img class="deco" src="assets/images/image76.png" style="left:-264px;top:38px;width:889px" alt="">
+    <img class="deco" src="assets/images/image77.png" style="left:1545px;top:15px;width:533px" alt="">
+    <img class="deco" src="assets/images/image77.png" style="left:1432px;top:615px;width:533px" alt="">
+    <p class="msg">결제가 완료되었습니다.<br>카드를 제거해주세요.</p>
+  </section>
+
+  <!-- 9. 주문 완료 (슬라이드 13) -->
+  <section class="screen msg-screen" id="screen-done">
+    <img class="deco" src="assets/images/image3.png" style="left:303px;top:-192px;width:506px" alt="">
+    <img class="deco" src="assets/images/image7.png" style="left:1000px;top:-286px;width:558px" alt="">
+    <img class="deco" src="assets/images/image5.png" style="left:1699px;top:-56px;width:657px" alt="">
+    <img class="deco" src="assets/images/image2.png" style="left:-310px;top:142px;width:618px" alt="">
+    <img class="deco" src="assets/images/image1.png" style="left:1559px;top:414px;width:651px" alt="">
+    <img class="deco" src="assets/images/image8.png" style="left:152px;top:687px;width:409px" alt="">
+    <img class="deco" src="assets/images/image6.png" style="left:836px;top:722px;width:528px" alt="">
+    <p class="msg">주문이 완료되었습니다.<br>감사합니다.</p>
+  </section>
+
+</div>
+<script src="js/app.js"></script>
+</body>
+</html>
