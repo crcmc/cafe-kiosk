@@ -51,11 +51,17 @@ function payBadge(m) {
   return "";
 }
 
+// 메뉴 이미지: 주문에 담긴 img 우선, 없으면(예전 주문) 이름 매핑으로
+function itemImg(it) {
+  const f = it.img || (window.MENU_IMG && window.MENU_IMG[it.name]);
+  return f ? `<span class="i-thumb"><img src="assets/images/${f}" alt=""></span>` : `<span class="i-thumb none"></span>`;
+}
+
 function card(o, done) {
   const el = document.createElement("div");
   el.className = "order-card" + (done ? " done" : "");
   const items = (o.items || []).map(it =>
-    `<li><span class="i-name">${it.name}</span><span class="i-qty">×${it.qty}</span>` +
+    `<li>${itemImg(it)}<span class="i-name">${it.name}</span><span class="i-qty">×${it.qty}</span>` +
     `<span class="i-amt">${(it.price * it.qty).toLocaleString()}원</span></li>`
   ).join("");
   el.innerHTML = `

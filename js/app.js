@@ -288,6 +288,7 @@ async function finishOrder() {
   const payload = {
     items: Object.values(cart).map(({ item, qty }) => ({
       name: item.name, qty, price: item.price,
+      img: item.img, // 포스에서 그림으로 메뉴 구분 (글 못 읽는 아이들용)
     })),
     total: cartTotal(),
     payMethod: payMethod || "unknown", // 카드/현금 — 포스에서 안내용

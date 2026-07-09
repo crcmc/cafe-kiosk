@@ -133,8 +133,9 @@ body {
 #col-done h2 .count { background: #9bbf85; }
 
 .orders {
+  /* 카드 한 장이 열 전체를 차지 — 태블릿에서도 크게, 글자 안 잘리게 */
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: 1fr;
   gap: 16px;
 }
 
@@ -186,14 +187,29 @@ body {
 .oc-items li {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 24px;
-  padding: 5px 0;
+  gap: 14px;
+  font-size: 28px;
+  padding: 7px 0;
+  word-break: keep-all;
 }
-.oc-items .i-name { flex: 1; }
-.oc-items .i-qty { font-weight: bold; color: var(--green); }
+/* 메뉴 이미지 썸네일 — 글 못 읽는 아이들도 그림으로 구분 */
+.i-thumb {
+  flex: none;
+  width: 58px;
+  height: 58px;
+  border-radius: 14px;
+  background: #EFF7E6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.i-thumb img { max-width: 72%; max-height: 82%; }
+.order-card.done .i-thumb { opacity: .65; }
+.oc-items .i-name { flex: 1; min-width: 0; }
+.oc-items .i-qty { font-weight: bold; color: var(--green); white-space: nowrap; }
 .order-card.done .oc-items .i-qty { color: #9bbf85; }
-.oc-items .i-amt { width: 110px; text-align: right; color: #6b7d63; }
+.oc-items .i-amt { text-align: right; color: #6b7d63; white-space: nowrap; }
 
 .oc-foot {
   display: flex;
@@ -224,8 +240,8 @@ body {
   border-radius: 16px;
 }
 
-/* 좁은 화면(세로 태블릿)에서는 한 칸으로 */
-@media (max-width: 820px) {
+/* 태블릿(가로 포함)에서는 새 주문/완료를 위아래로 쌓아 카드가 크게 보이게 */
+@media (max-width: 1180px) {
   #pos-main { grid-template-columns: 1fr; }
 }
 
