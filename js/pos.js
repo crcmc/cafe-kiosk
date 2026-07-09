@@ -96,6 +96,5 @@ function start() {
   setTimeout(() => { firstLoadDone = true; }, 1500);
 }
 
-// orders.js(모듈)가 먼저 로드됐으면 바로, 아니면 준비 이벤트를 기다림
-if (window.ORDERS_READY) start();
-else window.addEventListener("orders-ready", start, { once: true });
+// 시작은 로그인 잠금(auth-gate.js)이 제어한다. 잠금이 꺼져 있으면 즉시 실행됨.
+window.PAGE_START = start;

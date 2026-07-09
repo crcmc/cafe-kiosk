@@ -9,22 +9,32 @@ import {
   getDatabase, ref, push, set, update, get, runTransaction,
   query, orderByChild, equalTo, onChildAdded, onChildChanged
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import {
+  getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 // 참고: onChildAdded 같은 실시간 리스너는 인덱스 없이 경고만 뜨지만,
 // get(query...) 는 인덱스가 없으면 에러가 나므로 조회는 전체를 받아 걸러낸다.
 
 const cfg = window.FIREBASE_CONFIG || {};
 const configured = cfg.apiKey && !String(cfg.apiKey).startsWith("여기에") && cfg.databaseURL;
 
-let db = null;
+let db = null, auth = null;
 if (configured) {
   try {
-    db = getDatabase(initializeApp(cfg));
+    const app = initializeApp(cfg);
+    db = getDatabase(app);
+    auth = getAuth(app);
   } catch (e) {
     console.error("[orders] Firebase 초기화 실패:", e);
   }
 } else {
   console.warn("[orders] Firebase 설정이 아직 없어 실시간 연동이 꺼져 있습니다. (js/firebase-config.js)");
 }
+
+// ── 직원 로그인 (인증) ──
+window.watchAuth = function (cb) { if (auth) onAuthStateChanged(auth, cb); };
+window.signIn = function (email, pw) { return signInWithEmailAndPassword(auth, email, pw); };
+window.signOutUser = function () { return signOut(auth); };
 
 // 한국(KST, UTC+9) 기준 날짜 문자열 'YYYY-MM-DD' — 자정에 하루가 바뀜
 function kstDateKey(ts = Date.now()) {

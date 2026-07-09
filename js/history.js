@@ -83,5 +83,5 @@ function start() {
   go();
 }
 
-if (window.ORDERS_READY) start();
-else window.addEventListener("orders-ready", start, { once: true });
+// 시작은 로그인 잠금(auth-gate.js)이 제어한다. 잠금이 꺼져 있으면 즉시 실행됨.
+window.PAGE_START = start;
