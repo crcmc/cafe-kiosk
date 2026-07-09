@@ -1,74 +1,150 @@
-// 직원 페이지(주문현황·주문내역) 로그인 잠금.
-// window.REQUIRE_LOGIN 이 true 면 로그인 화면을 먼저 띄우고,
-// 로그인에 성공해야 페이지의 window.PAGE_START() 를 실행한다.
-// REQUIRE_LOGIN 이 false 면 잠금 없이 바로 실행한다 (기존 동작).
+// 로그인 잠금 (키오스크·포스·주문내역 공용).
+// - 확인 중에는 스플래시만 표시 → 로그인창 깜박임 없음
+// - 로그아웃 상태로 확인되면 그때 로그인 폼 표시 (구글/이메일)
+// - 허브(꿈 놀이터)와 같은 주소·같은 Firebase라 한 번 로그인하면 모두 열림
+// 페이지 스크립트는 window.PAGE_START 를 정의해두면 로그인 후 실행됨.
 
 (function () {
+  const body = document.body;
   let started = false;
-  function runPage() {
-    if (started) return;
-    started = true;
-    (window.PAGE_START || function () {})();
+
+  // ── 스타일 내장 (어느 페이지에서든 동작) ──
+  const style = document.createElement("style");
+  style.textContent = `
+    body.gate-locked > :not(#gate-overlay) { display: none !important; }
+    #gate-overlay {
+      position: fixed; inset: 0; z-index: 1000;
+      display: flex; align-items: center; justify-content: center;
+      background: #DFF7C2; padding: 20px; overflow: auto;
+      font-family: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    }
+    .gate-splash { text-align: center; animation: gatePulse 1.6s ease-in-out infinite; }
+    .gate-splash .em { font-size: 64px; display: block; margin-bottom: 12px; }
+    .gate-splash .tx { font-size: 22px; font-weight: 800; color: #2E7D33; }
+    @keyframes gatePulse { 0%,100% { opacity: .55; } 50% { opacity: 1; } }
+    .gate-box {
+      width: min(92vw, 400px); background: #fff; border: 1px solid #cfe4bd;
+      border-radius: 20px; box-shadow: 0 14px 36px rgba(60,110,60,.18);
+      padding: 34px 30px; text-align: center;
+    }
+    .gate-box h2 { font-size: 23px; font-weight: 800; color: #2C332A; margin: 4px 0 2px; }
+    .gate-brand { font-size: 20px; font-weight: 800; color: #2E7D33; }
+    .gate-sub { font-size: 15px; color: #6E7A69; margin: 6px 0 18px; }
+    .gate-box input {
+      font-family: inherit; font-size: 16px; padding: 13px 16px; width: 100%;
+      border: 1px solid #E1EAD8; border-radius: 12px; outline: none; margin-bottom: 10px;
+      box-sizing: border-box; color: #2C332A; background: #fff;
+    }
+    .gate-box input:focus { border-color: #43A047; }
+    .gate-google {
+      display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%;
+      font-family: inherit; font-size: 16px; font-weight: 700; padding: 13px;
+      border-radius: 12px; border: 1px solid #E1EAD8; background: #fff; color: #2C332A;
+      cursor: pointer; box-sizing: border-box;
+    }
+    .gate-google:hover { background: #FBFCF9; }
+    .gate-google .g {
+      width: 22px; height: 22px; border-radius: 50%; background: #fff; color: #4285F4;
+      border: 1px solid #e6e6e6; font-weight: 800; display: inline-flex;
+      align-items: center; justify-content: center; font-size: 14px;
+    }
+    .gate-or { display: flex; align-items: center; gap: 12px; margin: 16px 0; color: #9aab90; font-size: 13px; }
+    .gate-or::before, .gate-or::after { content: ""; flex: 1; height: 1px; background: #E1EAD8; }
+    .gate-login {
+      width: 100%; font-family: inherit; font-size: 17px; font-weight: 700; color: #fff;
+      background: #43A047; border: none; border-radius: 12px; padding: 13px; cursor: pointer;
+    }
+    .gate-login:hover { background: #2E7D33; }
+    .gate-box button:disabled { opacity: .6; cursor: default; }
+    .gate-err { min-height: 18px; margin: 12px 0 0; font-size: 14px; color: #d24b3a; font-weight: 600; }
+    #gate-logout {
+      position: fixed; right: 14px; bottom: 14px; z-index: 900;
+      font-family: inherit; font-size: 14px; font-weight: 700; color: #2E7D33;
+      background: rgba(255,255,255,.9); border: 2px solid #53AB58; border-radius: 16px;
+      padding: 7px 16px; cursor: pointer; opacity: .85;
+    }
+  `;
+  document.head.appendChild(style);
+
+  function overlay(html) {
+    let ov = document.getElementById("gate-overlay");
+    if (!ov) {
+      ov = document.createElement("div");
+      ov.id = "gate-overlay";
+      body.appendChild(ov);
+    }
+    ov.style.display = "flex";
+    ov.innerHTML = html;
+    return ov;
   }
 
-  function buildOverlay() {
-    if (document.getElementById("login-overlay")) return;
-    const ov = document.createElement("div");
-    ov.id = "login-overlay";
-    ov.innerHTML = `
-      <form id="login-box" autocomplete="on">
-        <div class="login-emoji">🔒</div>
-        <h2>직원 로그인</h2>
-        <p class="login-sub">오로라 주스 가게 관리 화면</p>
-        <input id="login-email" type="email" placeholder="이메일" autocomplete="username" required>
-        <input id="login-pw" type="password" placeholder="비밀번호" autocomplete="current-password" required>
-        <button type="submit" id="login-btn">로그인</button>
-        <p class="login-err" id="login-err"></p>
-      </form>`;
-    document.body.appendChild(ov);
+  // 페이지별 스플래시 문구 (키오스크/직원 화면 공용)
+  const isStaffPage = !!document.getElementById("pos-header");
+  const splashEm = "🧃";
+  const splashTx = "오로라 주스 가게";
 
-    ov.querySelector("#login-box").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const email = ov.querySelector("#login-email").value.trim();
-      const pw = ov.querySelector("#login-pw").value;
-      const btn = ov.querySelector("#login-btn");
-      const err = ov.querySelector("#login-err");
-      err.textContent = "";
-      btn.disabled = true; btn.textContent = "확인 중…";
-      try {
-        await window.signIn(email, pw);   // 성공하면 watchAuth 콜백이 화면을 엶
-      } catch (ex) {
-        err.textContent = "이메일 또는 비밀번호를 확인해 주세요.";
-        btn.disabled = false; btn.textContent = "로그인";
+  function showSplash() {
+    body.classList.add("gate-locked");
+    overlay(`<div class="gate-splash"><span class="em">${splashEm}</span><span class="tx">${splashTx}</span></div>`);
+  }
+
+  function showLogin() {
+    body.classList.add("gate-locked");
+    const ov = overlay(`
+      <div class="gate-box">
+        <div class="gate-brand">${splashEm} ${splashTx}</div>
+        <h2>선생님 로그인</h2>
+        <p class="gate-sub">꿈 놀이터 계정으로 로그인해 주세요.</p>
+        <button type="button" class="gate-google" id="gg-btn"><span class="g">G</span> 구글로 계속하기</button>
+        <div class="gate-or"><span>또는 이메일</span></div>
+        <form id="gate-form">
+          <input id="gate-email" type="email" placeholder="이메일" autocomplete="username" required>
+          <input id="gate-pw" type="password" placeholder="비밀번호" autocomplete="current-password" required>
+          <button type="submit" class="gate-login" id="gate-login">로그인</button>
+        </form>
+        <p class="gate-err" id="gate-err"></p>
+      </div>`);
+    const err = ov.querySelector("#gate-err");
+    const busy = (b) => ov.querySelectorAll("button,input").forEach(el => el.disabled = b);
+    ov.querySelector("#gg-btn").onclick = async () => {
+      err.textContent = ""; busy(true);
+      try { await window.signInGoogle(); }
+      catch (e) {
+        busy(false);
+        if (e && e.code !== "auth/popup-closed-by-user") err.textContent = "구글 로그인에 실패했어요.";
       }
+    };
+    ov.querySelector("#gate-form").addEventListener("submit", async (e) => {
+      e.preventDefault(); err.textContent = ""; busy(true);
+      try { await window.signIn(ov.querySelector("#gate-email").value.trim(), ov.querySelector("#gate-pw").value); }
+      catch (ex) { busy(false); err.textContent = "이메일 또는 비밀번호를 확인해 주세요."; }
     });
   }
 
-  function setOverlay(show) {
-    const ov = document.getElementById("login-overlay");
-    if (ov) ov.style.display = show ? "flex" : "none";
-  }
-
-  function addLogout() {
-    if (document.getElementById("logout-btn")) return;
-    const b = document.createElement("button");
-    b.id = "logout-btn";
-    b.textContent = "로그아웃";
-    b.onclick = async () => { await window.signOutUser(); location.reload(); };
-    document.body.appendChild(b);
+  function enter() {
+    body.classList.remove("gate-locked");
+    const ov = document.getElementById("gate-overlay");
+    if (ov) ov.style.display = "none";
+    // 로그아웃 버튼은 직원 화면(포스·내역)에만 — 키오스크에선 아이들이 누를 수 있어 숨김
+    if (isStaffPage && !document.getElementById("gate-logout")) {
+      const b = document.createElement("button");
+      b.id = "gate-logout";
+      b.textContent = "로그아웃";
+      b.onclick = async () => { await window.signOutUser(); location.reload(); };
+      body.appendChild(b);
+    }
+    if (!started) { started = true; (window.PAGE_START || function () {})(); }
   }
 
   function begin() {
-    // 잠금이 꺼져 있거나 인증을 못 쓰면 그냥 실행
     if (!window.REQUIRE_LOGIN || !window.ORDERS_ENABLED || !window.watchAuth) {
-      runPage();
+      enter();
       return;
     }
-    buildOverlay();
-    setOverlay(true);
+    showSplash(); // 확인 중엔 스플래시만 (로그인창 깜박임 방지)
     window.watchAuth(function (user) {
-      if (user) { setOverlay(false); addLogout(); runPage(); }
-      else { setOverlay(true); }
+      if (user) enter();
+      else showLogin();
     });
   }
 
