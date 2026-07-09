@@ -211,6 +211,13 @@ html, body {
   right: 12%;
   bottom: 12%;
 }
+/* 음료 그림에 그려진 잘못된 과일을 가리는 덮개 (예: 망고에이드의 레몬 → 망고) */
+.menu-card img.cover {
+  position: absolute;
+  width: 44%;
+  top: 4%;
+  right: 2%;
+}
 
 .menu-name {
   display: block;

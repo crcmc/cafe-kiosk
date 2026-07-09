@@ -13,7 +13,7 @@ const MENU = {
       { name: "망고",       img: "image15.svg",                          price: 3000 },
       { name: "키위망고",   img: "image15.svg", garnish: "image16.png", price: 2300 },
       { name: "사과",       img: "image18.svg",                          price: 1000 },
-      { name: "청포도케일", img: "image28.svg", garnish: "image29.png", price: 2000 },
+      { name: "청포도케일", img: "image28-grape.svg", garnish: "image29.png", price: 2000 },
       { name: "바나나",     img: "image22.svg",                          price: 4000 },
       { name: "수박",       img: "image20.svg",                          price: 2000 },
       { name: "레몬",       img: "image24.svg",                          price: 2100 },
@@ -25,7 +25,7 @@ const MENU = {
     cardSize: 354,
     items: [
       { name: "레몬라임에이드",   img: "image38.png",                          price: 2000 },
-      { name: "망고에이드",       img: "image37.png",                          price: 2000 },
+      { name: "망고에이드",       img: "image37.png", cover: "image39.png",   price: 2000 },
       { name: "오렌지에이드",     img: "image36.png",                          price: 1200 },
       { name: "복숭아키위에이드", img: "image35.svg", garnish: "image43.svg", price: 3000 },
     ],
@@ -156,6 +156,7 @@ function renderMenu() {
     btn.innerHTML = `
       <span class="menu-card">
         <img class="drink" src="${IMG}${item.img}" alt="">
+        ${item.cover ? `<img class="cover" src="${IMG}${item.cover}" alt="">` : ""}
         ${item.garnish ? `<img class="garnish" src="${IMG}${item.garnish}" alt="">` : ""}
       </span>
       <span class="menu-name">${item.name}</span>
